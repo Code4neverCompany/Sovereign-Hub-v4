@@ -1,0 +1,7 @@
+{
+  "swarm_mode": "ACTIVE",
+  "base_agents": ["sentinel", "architect", "developer", "ux_designer"],
+  "scaling_limit": 12,
+  "dynamic_assignments": true,
+  "latency_threshold_ms": 150
+}

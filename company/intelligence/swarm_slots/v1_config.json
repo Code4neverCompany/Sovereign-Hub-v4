@@ -1,0 +1,11 @@
+{
+  "total_slots": 12,
+  "slot_assignments": {
+    "slot_01_03": { "type": "ARCHITECT_CORE", "priority": "CRITICAL" },
+    "slot_04_06": { "type": "SENTINEL_SECURITY", "priority": "HIGH" },
+    "slot_07_10": { "type": "DEV_STREAMS", "priority": "NORMAL" },
+    "slot_11_12": { "type": "UX_AESTHETICS", "priority": "NORMAL" }
+  },
+  "burst_mode": "ALLOWED",
+  "handoff_protocol": "BMAD-v6-SYNC"
+}

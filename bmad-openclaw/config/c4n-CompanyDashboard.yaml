@@ -1,0 +1,19 @@
+project:
+  name: "c4n-CompanyDashboard"
+  root: "/home/skywork/workspace/c4n-CompanyDashboard"
+  bmad_output: "/home/skywork/workspace/c4n-CompanyDashboard/_bmad-output"
+
+planning:
+  artifacts_path: "planning-artifacts"
+  
+execution:
+  stories_path: "implementation-artifacts/stories"
+  
+reviews:
+  code_review: required
+  ux_review: required
+  qa_testing: optional
+
+defaults:
+  timeout_seconds: 1800
+  cleanup: keep

@@ -1,22 +1,16 @@
 # 🧠 4Never Neural Environmental Protocol (NEP v1.0)
-## Self-Learning Algorithm: Brain Autoloop
+## OMEGA STACK CONFIGURATION
 
-```javascript
-/**
- * 4Never Neural Learning Algorithm
- * Purpose: Automated Memory Synthesis & Optimization
- * Frequency: Every 30m (Pulse Synchronized)
- **/
+### 🔱 Model Binding (Frontier 2026.3)
+- **🏗️ Alex:** `anthropic/claude-opus-4-6` (Primary) + `openai/gpt-5.3-codex` (Secondary)
+- **🎨 Maya:** `anthropic/claude-opus-4-6` (Primary) + `google/gemini-3-pro-preview` (Secondary)
+- **📋 Jordan:** `openai/gpt-5.2-pro` (Primary) + `anthropic/claude-opus-4-6` (Secondary)
+- **💻 Dev:** `openai/gpt-5.3-codex` (Primary) + `anthropic/claude-opus-4-6` (Secondary)
+- **🛡️ Sam:** `anthropic/claude-opus-4-6` (Primary) + `openai/gpt-5.1-thinking` (Secondary)
 
-const BRAIN_PATH = "./BRAIN/";
-const AGENT_WORKSPACES = ["alex", "maya", "jordan", "dev", "sam"];
-
-async function synthesizeMemory() {
-    // 1. INGESTION: Scan Agent logs & Project Deltas
-    // 2. ABSTRACTION: Extract "Soul Gems" (Universal Truths learned during tasks)
-    // 3. STORAGE: Commit Soul Gems to BRAIN/memory/NEURAL_SYNAPSE.sql
-    // 4. OPTIMIZATION: Prune redundant task logs from workspaces to keep context small.
-}
-
-// Gate: Never prune ACTIVE_STORY data until Jordan marks 'DONE' in sprint-status.yaml.
-```
+### 🔱 Automated BMad Loop (FAB-WP)
+1. **TRIGGER:** "BMad Workflow"
+2. **EXECUTION MODE:** PARTYMODE (Standard Default)
+3. **Operational Authority:** Full Autonomous Proxy.
+4. **Safety Gate:** Sam (Sentinel) mandated for all Phase 5 releases.
+5. **Human Override:** ACTIVE (100% permission granted for high-velocity logic).

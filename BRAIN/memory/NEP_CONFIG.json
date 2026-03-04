@@ -1,0 +1,6 @@
+{
+  "name": "NEP-Algorithm",
+  "version": "1.0",
+  "learning_mode": "asynchronous",
+  "target": "./BRAIN/memory/"
+}

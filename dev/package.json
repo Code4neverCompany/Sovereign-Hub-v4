@@ -1,0 +1,7 @@
+{
+  "name": "dev-environment",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
+    "realtime-js": "latest"
+  }
+}

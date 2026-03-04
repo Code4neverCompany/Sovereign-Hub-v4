@@ -1,0 +1,7 @@
+Status: restored | Task: RESTORE_AGENT_IDENTITY
+[Wed Mar  4 07:31:26 UTC 2026] MAYA_RESTORATION: completed.
+Visual Guidelines 3.0: 
+- Void Black (#000000)
+- Imperial Gold (#c5a059)
+- Cyan-Glow (#00FFFF)
+Maya: Design-Regeln erklärt & Discord-Brücke bereit.

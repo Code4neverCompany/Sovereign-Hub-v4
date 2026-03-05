@@ -1,0 +1,198 @@
+/* 🔱 Lux 3.0 Global Style System 🔱 */
+/* Mission Control Dashboard - Sovereign Hub v3.9 */
+/* Designer: Maya | Developer: Dev | Phase: 4 */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* === LUX 3.0 COLOR PALETTE === */
+  --color-void-black: #000000;
+  --color-imperial-gold: #D4AF37;
+  --color-gold-glow: rgba(212, 175, 55, 0.3);
+  --color-gold-pulse: rgba(212, 175, 55, 0.6);
+  
+  /* === BACKGROUNDS === */
+  --bg-primary: var(--color-void-black);
+  --bg-glass: rgba(0, 0, 0, 0.7);
+  --bg-glass-hover: rgba(0, 0, 0, 0.85);
+  
+  /* === TEXT === */
+  --text-primary: var(--color-imperial-gold);
+  --text-secondary: rgba(212, 175, 55, 0.7);
+  
+  /* === BORDERS === */
+  --border-gold: 1px solid var(--color-imperial-gold);
+  --border-gold-glow: 1px solid var(--color-gold-glow);
+  
+  /* === EFFECTS === */
+  --shadow-gold-sm: 0 0 10px var(--color-gold-glow);
+  --shadow-gold-md: 0 0 20px var(--color-gold-glow);
+  --shadow-gold-lg: 0 0 40px var(--color-gold-pulse);
+  
+  /* === TRANSITIONS === */
+  --transition-fast: 0.2s ease-in-out;
+  --transition-medium: 0.5s ease-in-out;
+  --transition-slow: 0.8s ease-in-out;
+}
+
+/* === BASE STYLES === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+/* === GLASS-MORPHISM COMPONENTS === */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: var(--border-gold);
+  transition: all var(--transition-medium);
+}
+
+.glass:hover {
+  background: var(--bg-glass-hover);
+  box-shadow: var(--shadow-gold-md);
+  border-color: var(--color-imperial-gold);
+}
+
+/* === GLOWING GOLD EFFECTS === */
+.gold-glow {
+  color: var(--color-imperial-gold);
+  text-shadow: var(--shadow-gold-sm);
+}
+
+.gold-pulse {
+  animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: var(--shadow-gold-sm);
+  }
+  50% {
+    opacity: 0.6;
+    box-shadow: var(--shadow-gold-lg);
+  }
+}
+
+/* === MATERIALIZATION FADE === */
+.materialize {
+  animation: fade-in var(--transition-slow) ease-in-out;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === CIRCUIT LINES (For Logic Tree Widget) === */
+.circuit-line {
+  stroke: var(--color-imperial-gold);
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.circuit-line.active {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px var(--color-gold-pulse));
+  animation: pulse-gold 1.5s infinite;
+}
+
+.circuit-node {
+  fill: var(--color-imperial-gold);
+  filter: drop-shadow(0 0 6px var(--color-gold-glow));
+}
+
+.circuit-node.active {
+  animation: pulse-gold 1s infinite;
+}
+
+/* === RADIAL SCAN (For Sentinel Trace Widget) === */
+.radial-scan {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--color-imperial-gold);
+  opacity: 0.3;
+  animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.3;
+  }
+}
+
+.scan-pulse {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--color-imperial-gold);
+  border-radius: 50%;
+  box-shadow: var(--shadow-gold-lg);
+  animation: pulse-gold 2s infinite;
+}
+
+/* === BUTTONS === */
+.btn-glass {
+  @apply glass px-6 py-3 rounded-lg cursor-pointer;
+  @apply text-gold font-semibold tracking-wide;
+  @apply transition-all duration-300;
+}
+
+.btn-glass:hover {
+  @apply gold-glow;
+  transform: translateY(-2px);
+}
+
+.btn-glass:active {
+  transform: translateY(0);
+}
+
+/* === SCROLLBAR STYLING === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-imperial-gold);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-pulse);
+}

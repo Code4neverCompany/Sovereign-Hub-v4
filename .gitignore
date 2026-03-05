@@ -1,0 +1,14 @@
+node_modules/
+.openclaw/
+*.log
+*.tgz
+ARCHIVE/
+PROOF/
+tailscale/
+tmp/
+dist/
+build/
+.next/
+out/
+.env*
+! .env.example

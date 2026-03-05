@@ -1,0 +1,56 @@
+{
+  "theme": "Aureum Luxury",
+  "palette": {
+    "primary": {
+      "gold": "#D4AF37",
+      "gold-light": "#F9A602",
+      "gold-dark": "#996515"
+    },
+    "background": {
+      "obsidian": "#0B0B0B",
+      "onyx": "#353935"
+    },
+    "text": {
+      "ivory": "#FFFFF0",
+      "slate": "#708090"
+    },
+    "accents": {
+      "bronze": "#CD7F32",
+      "platinum": "#E5E4E2"
+    }
+  },
+  "typography": {
+    "fontWeights": {
+      "light": 300,
+      "normal": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "black": 900
+    }
+  },
+  "interactions": {
+    "heavy-vault-door": {
+      "animation": {
+        "duration": "1200ms",
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "description": "Slow start, heavy inertial swing, soft magnetic lock finish."
+      },
+      "shadows": "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+    }
+  },
+  "tailwind_config_extension": {
+    "theme": {
+      "extend": {
+        "colors": {
+          "aureum-gold": "#D4AF37",
+          "aureum-black": "#0B0B0B",
+          "aureum-ivory": "#FFFFF0"
+        },
+        "transitionTimingFunction": {
+          "vault": "cubic-bezier(0.4, 0, 0.2, 1)"
+        }
+      }
+    }
+  }
+}

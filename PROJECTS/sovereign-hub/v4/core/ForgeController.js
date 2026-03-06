@@ -4,7 +4,7 @@
  * Orchestrates the 1-hour "Sprint Forge" multi-agent pipeline.
  */
 
-class ForgeController {
+export class ForgeController {
     constructor(supabaseClient) {
         this.supabase = supabaseClient;
         this.activeSprint = null;
@@ -15,12 +15,15 @@ class ForgeController {
             'MAYA': { duration: 15 * 60 * 1000, agent: 'Maya', status: 'MOCKUP', next: 'DEV' },
             'DEV': { duration: 20 * 60 * 1000, agent: 'Dev', status: 'PROTOTYPE', next: 'VALIDATED' }
         };
+        this.initialized = false;
     }
 
     async init() {
+        if (this.initialized) return;
         console.log("ForgeController: Uplink_Stable.");
         this.subscribeToRealtime();
         this.checkResumeActiveSprint();
+        this.initialized = true;
     }
 
     subscribeToRealtime() {
@@ -34,10 +37,8 @@ class ForgeController {
     async handleDataChange(payload) {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const product = payload.new;
-            // Trigger local HUD update
             if (window.updateForgeHUD) window.updateForgeHUD(product);
             
-            // Auto-advance logic for autonomous mode
             if (product.forge_meta?.autonomous_sprint && product.status !== 'VALIDATED') {
                 this.manageSprintSequence(product);
             }
@@ -64,7 +65,6 @@ class ForgeController {
             return;
         }
 
-        // [SH-1400] INTEGRATION: Provision Deployment Manifest
         if (window.sovereignGateway) {
             const slug = product.name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, '');
             await window.sovereignGateway.provision(productId, slug);
@@ -95,10 +95,8 @@ class ForgeController {
 
     async manageSprintSequence(product) {
         const currentPhaseKey = product.forge_meta.current_phase || 'ALEX';
-        const phaseCfg = this.PHASES[currentPhaseKey];
         const elapsedSinceStart = Date.now() - new Date(product.forge_meta.timer_started_at).getTime();
         
-        // Phase logic based on time
         let targetPhase = currentPhaseKey;
         if (elapsedSinceStart >= (10+15+15) * 60 * 1000) targetPhase = 'DEV';
         else if (elapsedSinceStart >= (10+15) * 60 * 1000) targetPhase = 'MAYA';
@@ -111,11 +109,10 @@ class ForgeController {
     }
 
     async advancePhase(productId, nextPhase) {
-        const status = this.PHASES[nextPhase].status;
         await this.supabase
             .from('product_blueprints')
             .update({ 
-                status: status,
+                status: this.PHASES[nextPhase].status,
                 forge_meta: { 
                     ...this.activeSprint?.forge_meta,
                     current_phase: nextPhase 
@@ -125,7 +122,7 @@ class ForgeController {
     }
 
     async checkResumeActiveSprint() {
-        const { data, error } = await this.supabase
+        const { data } = await this.supabase
             .from('product_blueprints')
             .select('*')
             .eq('forge_meta->autonomous_sprint', true)
@@ -145,4 +142,4 @@ class ForgeController {
     }
 }
 
-window.ForgeController = ForgeController;
+export default ForgeController;

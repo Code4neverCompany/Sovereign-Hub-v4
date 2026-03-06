@@ -3,14 +3,11 @@
  * Logic to fetch hourly metrics and generate summaries.
  */
 
-class ExecutiveBriefing {
+export class ExecutiveBriefing {
     constructor(supabase) {
         this.supabase = supabase;
     }
 
-    /**
-     * Fetch metrics for the last hour
-     */
     async fetchHourlyMetrics() {
         const hourAgo = new Date(Date.now() - 3600000).toISOString();
         const now = new Date().toISOString();
@@ -38,15 +35,8 @@ class ExecutiveBriefing {
         };
     }
 
-    /**
-     * Generate a summary card HTML
-     */
     async generateSummaryCard() {
         const metrics = await this.fetchHourlyMetrics();
-        
-        // In a production environment, we'd send these metrics to Gemini-3-Flash for a narrative.
-        // For the HUD, we'll provide the distilled dashboard view.
-        
         return `
             <div class="glass-card p-6 border-l-4 border-gold bg-gold/5 animate-stagger">
                 <div class="flex justify-between items-start mb-4">
@@ -81,4 +71,4 @@ class ExecutiveBriefing {
     }
 }
 
-window.ExecutiveBriefing = ExecutiveBriefing;
+export default ExecutiveBriefing;

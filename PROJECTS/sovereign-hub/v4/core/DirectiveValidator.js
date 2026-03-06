@@ -7,7 +7,7 @@
  * Epic: Sovereign Governance & Policy [SH-1700]
  */
 
-class DirectiveValidator {
+export class DirectiveValidator {
   constructor(supabaseClient) {
     this.supabase = supabaseClient;
     this.activePolicies = [];
@@ -143,14 +143,12 @@ class DirectiveValidator {
         break;
 
       case 'system_uptime':
-        // Mock uptime check: Block if system load is too high
         if (mission.complexity && mission.complexity > policy.value.max_complexity) {
           result.violated = true;
           result.details = `Task complexity ${mission.complexity} exceeds safe uptime threshold ${policy.value.max_complexity}`;
         }
         break;
 
-      // Add more cases for operational/compliance rules here
       default:
         break;
     }
@@ -183,8 +181,4 @@ class DirectiveValidator {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = DirectiveValidator;
-} else {
-  window.DirectiveValidator = DirectiveValidator;
-}
+export default DirectiveValidator;

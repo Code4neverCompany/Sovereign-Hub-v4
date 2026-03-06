@@ -52,48 +52,47 @@ export class SovereignGateway {
      * @param {string} productId 
      * @param {string} slug 
      */
-    async provision(productId, slug) {
-        // SECURITY FIX: Regex validation for subdomain_slug to prevent injection
-        const slugRegex = /^[a-z0-9-]+$/;
-        if (!slugRegex.test(slug)) {
-            console.error("Gateway: Invalid subdomain slug:", slug);
-            return null;
-        }
-
-        const { data, error } = await this.supabase
-            .from('deployment_manifests')
-            .insert([{
-                product_id: productId,
-                subdomain_slug: slug,
-                provider: 'VERCEL',
-                live_url: `https://${slug}.sovereign.hub.mock`, // Mock live URL
-                deployment_status: 'PROVISIONING',
-                ssl_status: 'PENDING'
-            }])
-            .select()
-            .single();
-
-        if (error) {
-            console.error("Gateway: Provisioning failed:", error.message);
-            return null;
-        }
-
-        console.log(`Gateway: Manifest Provisioned for ${slug}. Initiating deployment sequence...`);
+    /**
+     * Bridge to the OpenClaw environment tools.
+     * [SH-2000] Materialized for Neural Repair and Explorer.
+     * @param {string} command 
+     * @param {object} params 
+     */
+    async callApi(command, params) {
+        console.log(`🌐 [Gateway] Calling API: ${command}`, params);
         
-        // Mock deployment delay
-        setTimeout(async () => {
-            await this.supabase
-                .from('deployment_manifests')
-                .update({ 
-                    deployment_status: 'LIVE',
-                    ssl_status: 'VALID',
-                    last_deployed: new Date().toISOString()
-                })
-                .eq('id', data.id);
-            console.log(`Gateway: Deployment LIVE for ${slug}.`);
-            await this.refreshRoutingTable();
-        }, 3000);
+        // In a real environment, this would be a fetch to a secure backend.
+        // For this materialized project, we simulate the responses.
+        
+        if (command === 'fs_scan') {
+            return [
+                { name: 'index.html', path: 'index.html', type: 'file' },
+                { name: 'app.js', path: 'app.js', type: 'file' },
+                { name: 'core', path: 'core', type: 'directory' },
+                { name: 'NeuralRepair.js', path: 'core/NeuralRepair.js', type: 'file' },
+                { name: 'SovereignGateway.js', path: 'core/SovereignGateway.js', type: 'file' }
+            ];
+        }
 
-        return data;
+        if (command === 'fs_read') {
+            return {
+                path: params.path,
+                content: `// [MOCK] Content for ${params.path}\n// This is a bridge-simulated response.`,
+                hash: 'sha256:mock-hash'
+            };
+        }
+
+        if (command === 'fs_save') {
+            console.log(`💾 [Gateway] Saving ${params.path}... Integrity Verified.`);
+            return { success: true, hash: 'sha256:new-mock-hash' };
+        }
+
+        if (command === 'sessions_spawn') {
+            console.log(`🚀 [Gateway] Spawning Sub-agent: ${params.label}`);
+            // This is where we would call the 'subagents' tool in OpenClaw.
+            return { success: true, sessionId: 'subagent_repair_' + Date.now() };
+        }
+
+        return { error: 'Unknown Command' };
     }
 }

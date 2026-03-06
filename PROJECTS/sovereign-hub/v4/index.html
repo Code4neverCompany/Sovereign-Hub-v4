@@ -23,6 +23,8 @@
     <script src="core/TrafficEmulator.js" type="module"></script>
     <script src="core/SovereignGateway.js" type="module"></script>
     <script src="core/NexusController.js"></script>
+    <script src="core/PersistenceWarden.js"></script>
+    <script src="core/NeuralRepair.js" type="module"></script>
     <script type="module">
         import { EngineSwitch } from './core/engine-switch.js';
         import { TemporalEngine } from './core/TemporalEngine.js';
@@ -30,6 +32,7 @@
         import { TrafficEmulator } from './core/TrafficEmulator.js';
         import { SovereignGateway } from './core/SovereignGateway.js';
         import { RevenueController } from './core/RevenueController.js';
+        import { NeuralRepair } from './core/NeuralRepair.js';
         
         window.engineSwitch = new EngineSwitch();
         window.temporalEngine = new TemporalEngine();
@@ -39,6 +42,8 @@
         window.revenueController = new RevenueController(window.supabaseClient);
         window.directiveValidator = new DirectiveValidator(window.supabaseClient);
         window.riskCalculus = new RiskCalculus(window.supabaseClient);
+        window.persistenceWarden = new PersistenceWarden(window.supabaseClient);
+        window.neuralRepair = new NeuralRepair(window.supabaseClient);
         
         // Final Fix: Force initial tab sync
         window.onload = () => {
@@ -53,6 +58,8 @@
             window.trafficEmulator.start();
             window.sovereignGateway.init();
             window.revenueController.init();
+            window.persistenceWarden.init();
+            window.neuralRepair.init();
             
             initForgeTab();
         };
@@ -123,87 +130,6 @@
                 }
             }
         }
-    </script>
-    
-    <script src="core/ForgeController.js"></script>
-    <script src="core/ExecutiveBriefing.js"></script>
-    <script src="core/SwarmPulse.js"></script>
-    <script src="core/RevenueController.js"></script>
-    <script src="core/TemporalEngine.js" type="module"></script>
-    <script src="core/TokenDrift.js" type="module"></script>
-    <script src="core/TrafficEmulator.js" type="module"></script>
-    <script src="core/SovereignGateway.js" type="module"></script>
-    <script type="module">
-        import { EngineSwitch } from './core/engine-switch.js';
-        import { TemporalEngine } from './core/TemporalEngine.js';
-        import { TokenDrift } from './core/TokenDrift.js';
-        import { TrafficEmulator } from './core/TrafficEmulator.js';
-        import { SovereignGateway } from './core/SovereignGateway.js';
-        import { RevenueController } from './core/RevenueController.js';
-        
-        window.engineSwitch = new EngineSwitch();
-        window.temporalEngine = new TemporalEngine();
-        window.tokenDrift = new TokenDrift('token-drift-canvas');
-        window.trafficEmulator = new TrafficEmulator(window.supabaseClient);
-        window.sovereignGateway = new SovereignGateway(window.supabaseClient);
-        window.revenueController = new RevenueController(window.supabaseClient);
-        window.directiveValidator = new DirectiveValidator(window.supabaseClient);
-        window.riskCalculus = new RiskCalculus(window.supabaseClient);
-        
-        // Final Fix: Force initial tab sync
-        window.onload = () => {
-            const firstButton = document.querySelector('#top-nav button');
-            if (firstButton) window.switchTab('dashboard', firstButton);
-            
-            document.getElementById('nexus-form').addEventListener('submit', handleDispatch);
-            subscribeToRealtime();
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toISOString().substring(11, 19) + ' UTC'; }, 1000);
-            
-            // Start Services
-            window.trafficEmulator.start();
-            window.sovereignGateway.init();
-            window.revenueController.init();
-            
-            initForgeTab();
-        };
-
-        window.switchTab = function(name, el) {
-            const pill = document.getElementById('nav-pill');
-            if (pill && el) {
-                pill.style.width = el.offsetWidth+'px'; pill.style.height = el.offsetHeight+'px';
-                pill.style.left = el.offsetLeft+'px'; pill.style.top = el.offsetTop+'px';
-            }
-            document.querySelectorAll('#top-nav button').forEach(b => { b.classList.add('text-white/40'); b.classList.remove('text-gold'); });
-            if (el) { el.classList.remove('text-white/40'); el.classList.add('text-gold'); }
-            
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            const tab = document.getElementById(name+'-tab');
-            if (tab) tab.classList.add('active');
-            if (name === 'revenue') {
-                const detTab = document.getElementById('revenue-detailed-tab');
-                if (detTab) detTab.classList.add('active');
-            }
-            
-            if(name==='dashboard') loadDashboard();
-            if(name==='analytics') loadAnalytics();
-            if(name==='content') loadContent();
-            if(name==='agents') { loadAgents(); loadSwarmPulse(); }
-            if(name==='forge') loadForge();
-            if(name==='revenue') loadRevenue();
-            if(name==='tasks') loadTasks();
-            if(name==='infrastructure') loadInfrastructure();
-            if(name==='trace') loadTrace();
-            if(name==='command') loadCommand();
-            if(name==='growth') loadGrowth();
-            if(name==='explorer') loadExplorer();
-            if(name==='governance') loadGovernance();
-            if(name==='loopshield') loadLoopShield();
-        }
-
-        window.forgeController = new ForgeController(window.supabaseClient);
-        window.forgeController.init();
-        window.executiveBriefing = new ExecutiveBriefing(window.supabaseClient);
-        window.swarmPulse = new SwarmPulse(window.supabaseClient);
     </script>
 
     <style>
@@ -383,6 +309,71 @@
         .audit-line.blocked { border-left-color: #ef4444; }
         .audit-line.warn { border-left-color: #D4AF37; }
 
+        /* [SH-1900] Persistence HUD Styles */
+        @keyframes sync-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .syncing-ring {
+            animation: sync-rotate 2s linear infinite;
+            stroke: #00FFFF !important;
+            stroke-dasharray: 70 213 !important;
+        }
+        .warning-ring {
+            stroke: #EF4444 !important;
+            animation: pulse-red 1.5s infinite;
+        }
+        @keyframes pulse-red {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        #persistence-hud { background: rgba(0, 255, 255, 0.02); }
+
+        /* [SH-2000] Singularity Pulse Styles */
+        .pulse-healthy { color: #00FFFF; }
+        .pulse-repairing { color: #FF3131; }
+        
+        @keyframes singularity-breathe {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        
+        @keyframes singularity-erratic {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1) rotate(2deg); }
+            50% { transform: scale(0.9) rotate(-2deg); }
+            75% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        .path-ring-1 { animation: sync-rotate 20s linear infinite; transform-origin: center; }
+        .path-ring-2 { animation: sync-rotate 15s linear reverse infinite; transform-origin: center; }
+        .pulse-core { animation: singularity-breathe 4s ease-in-out infinite; transform-origin: center; }
+        .repairing .pulse-core { animation: singularity-erratic 0.25s infinite; }
+        .repairing .pulse-glow { background: #FF3131; }
+        .pulse-glow { transition: background 1s ease; }
+
+        .diagnostic-matrix-item { border-left: 2px solid transparent; transition: all 0.3s ease; }
+        .diagnostic-matrix-item:hover { background: rgba(255, 255, 255, 0.02); }
+        .status-nominal { border-left-color: #00FFFF; color: rgba(0, 255, 255, 0.8); }
+        .status-healing { border-left-color: #FF3131; color: rgba(255, 49, 49, 0.8); }
+        .status-hardened { border-left-color: #D4AF37; color: rgba(212, 175, 55, 0.8); }
+
+        /* [SH-2000] Singularity Pulse Styles */
+        .pulse-healthy { color: #10B981; }
+        .pulse-warning { color: #D4AF37; }
+        .pulse-critical { color: #EF4444; }
+        .pulse-core { transition: color 0.5s ease; }
+        .path-ring-1 { animation: rotate 20s linear infinite; transform-origin: center; }
+        .path-ring-2 { animation: rotate-reverse 15s linear infinite; transform-origin: center; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .diagnostic-matrix-item { border-left: 2px solid transparent; transition: all 0.3s ease; }
+        .diagnostic-matrix-item.status-nominal { border-left-color: #10B981; }
+        .diagnostic-matrix-item.status-warning { border-left-color: #D4AF37; background: rgba(212, 175, 55, 0.05); }
+        .diagnostic-matrix-item.status-critical { border-left-color: #EF4444; background: rgba(239, 68, 68, 0.05); animation: pulse-red-bg 2s infinite; }
+        @keyframes pulse-red-bg { 0%, 100% { background: rgba(239, 68, 68, 0.05); } 50% { background: rgba(239, 68, 68, 0.1); } }
     </style>
 </head>
 <body class="h-screen w-screen flex flex-col font-sans">
@@ -420,9 +411,21 @@
             <button onclick="switchTab('governance', this)" class="relative z-10 px-6 py-2 text-sm font-medium text-white/40 hover:text-gold transition-colors duration-300">Governance</button>
             <button onclick="switchTab('settings', this)" class="relative z-10 px-6 py-2 text-sm font-medium text-white/40 hover:text-gold transition-colors duration-300">Settings</button>
             <button onclick="switchTab('loopshield', this)" class="relative z-10 px-6 py-2 text-sm font-medium text-white/40 hover:text-cyan transition-colors duration-300">LoopShield AI</button>
+            <button onclick="switchTab('diagnostics', this)" class="relative z-10 px-6 py-2 text-sm font-medium text-white/40 hover:text-rose-500 transition-colors duration-300">Diagnostics</button>
         </nav>
 
         <div class="flex items-center gap-4">
+            <!-- [SH-2000] Singularity Pulse Node -->
+            <div id="singularity-pulse" class="group relative cursor-pointer pulse-healthy" onclick="switchTab('diagnostics', document.querySelector('[onclick*=\'diagnostics\']'))">
+                <div id="pulse-glow" class="pulse-glow absolute inset-0 rounded-full bg-emerald-500 opacity-20 blur-xl group-hover:opacity-40 transition-opacity"></div>
+                <div class="pulse-core relative w-6 h-6 rounded-full border-2 border-emerald-500/40 flex items-center justify-center bg-void/60 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                    <div id="pulse-dot" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#10B981] animate-pulse"></div>
+                </div>
+                <!-- Mini Tooltip -->
+                <div class="absolute top-10 right-0 glass-card p-2 px-3 border-white/10 hidden group-hover:block whitespace-nowrap z-[100]">
+                    <span id="pulse-status-text" class="text-[8px] font-mono text-emerald-400 uppercase tracking-widest">Neural_Nominal</span>
+                </div>
+            </div>
             <button onclick="openNexusModal()" class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan/10 border border-cyan/30 text-cyan text-[10px] font-bold uppercase tracking-widest hover:bg-cyan/20 transition-all shadow-[0_0_15px_rgba(0,255,255,0.1)]">
                 <span class="relative flex h-2 w-2">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan opacity-75"></span>
@@ -495,6 +498,51 @@
                             <span class="text-[10px] font-mono text-cyan bg-cyan/10 px-2 py-1 rounded border border-cyan/20 animate-pulse">STREAMING</span>
                         </div>
                         <div class="flex-1 overflow-y-auto space-y-4 font-mono text-[11px] pr-2" id="dashboard-activity-feed"></div>
+                    </div>
+                </div>
+
+                <!-- [SH-1900] Persistence Warden HUD -->
+                <div class="grid grid-cols-12 gap-6 mt-6">
+                    <div class="glass-card p-6 flex flex-col col-span-12 border-cyan/10" id="persistence-hud">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-4">
+                                <!-- Sync Ring SVG -->
+                                <div class="relative w-12 h-12">
+                                    <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(212, 175, 55, 0.05)" stroke-width="4" />
+                                        <circle id="persistence-ring" cx="50" cy="50" r="45" fill="none" stroke="#D4AF37" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" class="transition-all duration-1000" />
+                                    </svg>
+                                    <div id="persistence-icon" class="absolute inset-0 flex items-center justify-center text-[10px]">🔒</div>
+                                </div>
+                                <div>
+                                    <h3 class="text-gold/80 font-bold uppercase text-[10px] tracking-[0.3em]">Persistence_Warden // Cloud_Health</h3>
+                                    <p id="warden-pulse-status" class="text-[8px] font-mono text-cyan/60 uppercase tracking-widest mt-1">Status: Hardened</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-center">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[8px] text-white/20 uppercase font-mono">Uncommitted</span>
+                                    <span id="uncommitted-count" class="text-xs font-bold text-cyan">0 Files</span>
+                                </div>
+                                <button onclick="window.persistenceWarden.forceSync()" id="force-sync-btn" class="px-3 py-1.5 bg-gold/5 border border-gold/20 text-gold text-[8px] font-bold uppercase rounded hover:bg-gold/10 transition-all">Force_Sync</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Repo Matrix -->
+                        <div class="flex-1 overflow-y-auto max-h-[200px] custom-scrollbar">
+                            <table class="w-full text-left">
+                                <thead class="text-[8px] font-mono text-white/20 uppercase border-b border-white/5">
+                                    <tr>
+                                        <th class="pb-2">Repository</th>
+                                        <th class="pb-2">Status</th>
+                                        <th class="pb-2 text-right">Last_Pulse</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="repo-matrix-body" class="text-[10px] font-mono">
+                                    <!-- Injected by PersistenceWarden.js -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1079,16 +1127,38 @@
                 <div class="grid grid-cols-12 gap-8">
                     <!-- Left: Vocal Directive & Intelligence Briefing -->
                     <div class="col-span-4 flex flex-col gap-8">
-                        <!-- Vocal Directive Orb -->
-                        <div class="glass-card p-10 flex flex-col items-center justify-center relative animate-stagger">
-                            <h3 class="absolute top-6 left-8 text-gold/60 font-bold uppercase text-[10px] tracking-[0.3em]">Directive_Uplink // Vocal_Orb</h3>
-                            <div id="voice-orb" onclick="toggleVoiceListener()" class="mt-4">
-                                <span id="orb-icon" class="text-3xl">🎙️</span>
-                                <div id="orb-waves"></div>
+                        <!-- Neural Singularity Pulse [SH-2000] -->
+                        <div class="glass-card p-10 flex flex-col items-center justify-center relative animate-stagger" id="singularity-card">
+                            <h3 class="absolute top-6 left-8 text-gold/60 font-bold uppercase text-[10px] tracking-[0.3em]">Singularity_Pulse // Immune_System</h3>
+                            
+                            <div id="singularity-pulse" class="relative w-48 h-48 cursor-pointer group pulse-healthy flex items-center justify-center">
+                                <!-- Outer Glow -->
+                                <div class="absolute inset-0 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pulse-glow bg-cyan/20"></div>
+                                
+                                <svg viewBox="0 0 200 200" class="w-full h-full relative z-10">
+                                    <circle cx="100" cy="100" r="80" fill="none" stroke="currentColor" stroke-width="0.5" stroke-dasharray="10 20" class="path-ring-1" />
+                                    <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="40 10" class="path-ring-2" />
+                                    <circle cx="100" cy="100" r="15" fill="currentColor" class="pulse-core shadow-[0_0_30px_currentColor]" />
+                                </svg>
                             </div>
-                            <div class="mt-6 text-center">
-                                <p id="voice-status" class="text-[10px] font-mono text-white/20 uppercase tracking-widest">Awaiting_Vocal_Input</p>
-                                <p id="voice-transcript" class="mt-2 text-xs text-cyan/60 italic font-sans min-h-[1.5rem]"></p>
+
+                            <div class="mt-4 text-center">
+                                <p id="singularity-status" class="text-[10px] font-mono text-cyan uppercase tracking-widest">Systems_Nominal</p>
+                            </div>
+                        </div>
+
+                        <!-- Neural Diagnostic Matrix [SH-2000] -->
+                        <div class="glass-card p-6 flex flex-col gap-4 animate-stagger" style="animation-delay: 0.1s;">
+                            <div class="flex items-center justify-between border-b border-white/5 pb-3">
+                                <h3 class="text-gold/60 font-bold uppercase text-[9px] tracking-widest">Diagnostic_Matrix // Neural_Events</h3>
+                                <span class="text-[8px] font-mono text-white/20 uppercase tracking-tighter">Realtime_Feed</span>
+                            </div>
+                            <div id="diagnostic-matrix-feed" class="flex-1 overflow-y-auto space-y-2 font-mono text-[10px] pr-2 max-h-[250px] custom-scrollbar">
+                                <!-- Diagnostic entries injected here -->
+                                <div class="diagnostic-matrix-item status-nominal p-2 rounded-r bg-white/[0.01]">
+                                    <div class="flex justify-between font-bold"><span>[EVENT] integrity.check</span><span>NOMINAL</span></div>
+                                    <p class="text-[8px] text-white/40 mt-1 italic">Core_Engine: All validation passes successful.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -1138,97 +1208,65 @@
                                 <!-- Prototype summaries injected here -->
                             </div>
                         </div>
+
+                        <!-- [SH-1900] Persistence Warden HUD -->
+                        <div class="glass-card p-6 flex flex-col col-span-2 border-cyan/10" id="persistence-hud">
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex items-center gap-4">
+                                    <!-- Sync Ring SVG -->
+                                    <div class="relative w-12 h-12">
+                                        <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                                            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(212, 175, 55, 0.05)" stroke-width="4" />
+                                            <circle id="persistence-ring" cx="50" cy="50" r="45" fill="none" stroke="#D4AF37" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" stroke-linecap="round" class="transition-all duration-1000" />
+                                        </svg>
+                                        <div id="persistence-icon" class="absolute inset-0 flex items-center justify-center text-[10px]">🔒</div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-gold/80 font-bold uppercase text-[10px] tracking-[0.3em]">Persistence_Warden // Cloud_Health</h3>
+                                        <p id="warden-pulse-status" class="text-[8px] font-mono text-cyan/60 uppercase tracking-widest mt-1">Status: Hardened</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-6 items-center">
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-[8px] text-white/20 uppercase font-mono">Uncommitted</span>
+                                        <span id="uncommitted-count" class="text-xs font-bold text-cyan">0 Files</span>
+                                    </div>
+                                    <button id="force-sync-btn" class="px-3 py-1.5 bg-gold/5 border border-gold/20 text-gold text-[8px] font-bold uppercase rounded hover:bg-gold/10 transition-all">Force_Sync</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Repo Matrix -->
+                            <div class="flex-1 overflow-y-auto custom-scrollbar">
+                                <table class="w-full text-left">
+                                    <thead class="text-[8px] font-mono text-white/20 uppercase border-b border-white/5">
+                                        <tr>
+                                            <th class="pb-2">Repository</th>
+                                            <th class="pb-2">Status</th>
+                                            <th class="pb-2 text-right">Last_Pulse</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="repo-matrix-body" class="text-[10px] font-mono">
+                                        <!-- Injected by PersistenceWarden.js -->
+                                        <tr class="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
+                                            <td class="py-3 text-white/60 font-bold">sovereign-hub-v4</td>
+                                            <td class="py-3"><span class="px-1.5 py-0.5 rounded text-[8px] border border-emerald-500/20 text-emerald-400">GREEN</span></td>
+                                            <td class="py-3 text-right text-white/20">2m ago</td>
+                                        </tr>
+                                        <tr class="border-b border-white/[0.02] hover:bg-white/[0.01] transition-colors">
+                                            <td class="py-3 text-white/60 font-bold">nexus-strategy</td>
+                                            <td class="py-3"><span class="px-1.5 py-0.5 rounded text-[8px] border border-gold/20 text-gold">YELLOW</span></td>
+                                            <td class="py-3 text-right text-white/20">15m ago</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- [SH-1200] Tab: Forge -->
-        <section id="forge-tab" class="tab-panel">
-            <div class="max-w-[1600px] mx-auto space-y-8 h-[calc(100vh-160px)] flex flex-col">
-                <div class="grid grid-cols-12 gap-8 flex-1 overflow-hidden">
-                    
-                    <!-- Left Column: The Incubator & Scout Feed -->
-                    <div class="col-span-4 flex flex-col gap-6">
-                        <!-- Component A: The Incubator -->
-                        <div class="glass-card p-8 flex flex-col items-center justify-center relative overflow-hidden h-[400px]">
-                            <h3 class="absolute top-6 left-8 text-gold/60 font-bold uppercase text-[10px] tracking-[0.3em]">Incubator_Cycle // Sprint_Alpha</h3>
-                            <div class="relative w-64 h-64">
-                                <!-- Outer Timer Ring (60m) -->
-                                <svg class="w-full h-full transform -rotate-90">
-                                    <circle cx="128" cy="128" r="120" stroke="rgba(212, 175, 55, 0.05)" stroke-width="4" fill="transparent" />
-                                    <circle id="forge-timer-outer" cx="128" cy="128" r="120" stroke="#D4AF37" stroke-width="4" fill="transparent" 
-                                            stroke-dasharray="754" stroke-dashoffset="754" class="transition-all duration-1000 ease-linear" />
-                                </svg>
-                                <!-- Central Timer Display -->
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span id="forge-timer-countdown" class="text-4xl font-bold text-white text-gold-glow font-mono">60:00</span>
-                                    <span id="forge-current-phase-label" class="text-[10px] text-cyan font-mono uppercase tracking-widest mt-2 animate-pulse">Awaiting_Initiation</span>
-                                </div>
-                            </div>
-                            <!-- Phase Indicators -->
-                            <div class="mt-8 flex gap-6">
-                                <div id="phase-scout" class="forge-phase-indicator flex flex-col items-center gap-1">
-                                    <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3B82F6]"></div>
-                                    <span class="text-[8px] font-mono text-blue-500">SCOUT</span>
-                                </div>
-                                <div id="phase-prd" class="forge-phase-indicator flex flex-col items-center gap-1">
-                                    <div class="w-2 h-2 rounded-full bg-gold shadow-[0_0_8px_#D4AF37]"></div>
-                                    <span class="text-[8px] font-mono text-gold">PRD</span>
-                                </div>
-                                <div id="phase-design" class="forge-phase-indicator flex flex-col items-center gap-1">
-                                    <div class="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_#A855F7]"></div>
-                                    <span class="text-[8px] font-mono text-purple-500">DESIGN</span>
-                                </div>
-                                <div id="phase-code" class="forge-phase-indicator flex flex-col items-center gap-1">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981]"></div>
-                                    <span class="text-[8px] font-mono text-emerald-500">CODE</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Component D: Scout Feed -->
-                        <div class="glass-card flex-1 p-6 flex flex-col overflow-hidden">
-                            <div class="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
-                                <h3 class="text-gold/60 font-bold uppercase text-[9px] tracking-widest">Market_Scout // Live_Pulse</h3>
-                                <div class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-cyan animate-pulse"></div><span class="text-[8px] font-mono text-cyan/60 uppercase">Searching...</span></div>
-                            </div>
-                            <div id="forge-scout-feed" class="flex-1 overflow-y-auto space-y-3 font-mono text-[10px] pr-2 custom-scrollbar">
-                                <!-- Feed Items -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: DNA Strand & Blueprint Gallery -->
-                    <div class="col-span-8 flex flex-col gap-6">
-                        <div class="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
-                            <!-- Component B: The DNA Strand -->
-                            <div class="col-span-3 glass-card p-6 flex flex-col items-center overflow-hidden">
-                                <h3 class="text-gold/60 font-bold uppercase text-[10px] tracking-[0.3em] mb-8">Evolution_DNA</h3>
-                                <div id="forge-dna-container" class="flex-1 w-full relative">
-                                    <svg id="forge-dna-viz" class="w-full h-full"></svg>
-                                </div>
-                            </div>
-
-                            <!-- Component C: Blueprint Gallery -->
-                            <div class="col-span-9 glass-card p-8 flex flex-col overflow-hidden">
-                                <div class="flex justify-between items-center mb-8">
-                                    <div>
-                                        <h3 class="text-gold/80 font-bold uppercase text-xs tracking-widest">Product_Vault</h3>
-                                        <p class="text-[9px] text-white/30 uppercase mt-1">Autonomous_Prototypes // Market_Aware</p>
-                                    </div>
-                                    <button onclick="startNewSprint()" class="px-4 py-2 bg-gold/10 border border-gold/20 text-gold text-[10px] font-bold uppercase rounded hover:bg-gold/20 transition-all">Manual_Forge_Trigger</button>
-                                </div>
-                                <div id="forge-blueprint-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-6 pr-4 custom-scrollbar">
-                                    <!-- Cards go here -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
 
         <!-- Tab: Revenue [SH-1400] -->
         <section id="revenue-detailed-tab" class="tab-panel">
@@ -1371,105 +1409,6 @@
         </section>
 
         <!-- Tab: Command [SH-1300] -->
-        <section id="command-tab" class="tab-panel">
-            <div class="max-w-[1920px] mx-auto grid grid-cols-12 gap-8 h-[calc(100vh-160px)]">
-                
-                <!-- Left Sidebar: CEO Briefing & The Pulse (Cols 1-3) -->
-                <div class="col-span-3 flex flex-col gap-6 overflow-hidden">
-                    <div class="glass-card p-6 flex flex-col gap-6 animate-stagger" style="animation-delay: 0.1s;">
-                        <h3 class="text-gold font-cinzel font-bold text-xs tracking-[0.2em] uppercase text-gold-glow">The_Pulse // Performance</h3>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="text-[9px] text-white/20 uppercase font-mono">Real-time Burn</span>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-2xl font-bold text-gold">$1.42</span>
-                                    <span class="text-[9px] text-gold/40">/hr</span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col gap-1">
-                                <span class="text-[9px] text-white/20 uppercase font-mono">Neural Success</span>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-2xl font-bold text-cyan">98.4%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-gold to-cyan" style="width: 85%"></div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card flex-1 p-6 flex flex-col overflow-hidden animate-stagger" style="animation-delay: 0.2s;">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-gold font-cinzel font-bold text-xs tracking-[0.2em] uppercase">CEO_Briefing</h3>
-                            <span class="text-[8px] font-mono text-cyan/60">HOURLY_RECON</span>
-                        </div>
-                        <div id="briefing-feed" class="flex-1 overflow-y-auto space-y-4 pr-2 briefing-scroll">
-                            <div class="briefing-card p-4 rounded-xl border border-white/5 space-y-2">
-                                <div class="flex justify-between text-[9px] font-mono">
-                                    <span class="text-gold">T-0h</span>
-                                    <span class="text-white/20">2026-03-05 20:00</span>
-                                </div>
-                                <p class="text-[11px] text-white/80 leading-relaxed font-sans">Hive activity spiked in <span class="text-cyan">DePIN_Nexus</span>. Alex identified 3 high-yield niche opportunities. Cost-to-Task ratio remains optimal.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Center: God-View HUD (Cols 4-9) -->
-                <div class="col-span-6 relative flex flex-col gap-6">
-                    <div class="glass-card flex-1 relative overflow-hidden animate-stagger" style="animation-delay: 0.3s;">
-                        <div id="god-view-map" class="w-full h-full"></div>
-                        
-                        <!-- HUD Overlays -->
-                        <div class="absolute inset-0 pointer-events-none border-[20px] border-transparent shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]"></div>
-                        
-                        <!-- Command Orb -->
-                        <div class="command-orb-container" id="command-orb-trigger">
-                            <div class="command-orb-ring"></div>
-                            <div class="command-orb"></div>
-                            <div class="command-orb-core">
-                                <div class="command-orb-vocal"></div>
-                            </div>
-                        </div>
-
-                        <!-- Forge DNA Overlay -->
-                        <div class="absolute top-10 right-10 w-32 h-64 pointer-events-none opacity-40">
-                            <svg id="god-view-dna" class="w-full h-full"></svg>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Dock: Forge Status -->
-                    <div class="h-32 glass-card p-4 flex items-center gap-6 overflow-hidden animate-stagger" style="animation-delay: 0.4s;">
-                        <div class="shrink-0 flex flex-col justify-center border-r border-white/5 pr-6 h-full">
-                            <span class="text-[10px] font-bold text-gold uppercase tracking-widest">Forge_Stack</span>
-                            <span class="text-[8px] font-mono text-white/20 uppercase mt-1">Active_Prototypes</span>
-                        </div>
-                        <div id="command-forge-dock" class="flex-1 flex gap-4 overflow-x-auto briefing-scroll pb-2"></div>
-                    </div>
-                </div>
-
-                <!-- Right Sidebar: Directive Uplink (Cols 10-12) -->
-                <div class="col-span-3 flex flex-col gap-6 overflow-hidden">
-                    <div class="glass-card p-6 h-48 flex flex-col gap-4 animate-stagger" style="animation-delay: 0.5s;">
-                        <h3 class="text-gold font-cinzel font-bold text-xs tracking-[0.2em] uppercase">Vocal_Transcription</h3>
-                        <div id="vocal-transcript" class="flex-1 bg-black/40 border border-gold/10 rounded-xl p-4 font-mono text-[11px] text-cyan/80 italic leading-relaxed">
-                            "Awaiting Sovereign voice input..."
-                        </div>
-                    </div>
-
-                    <div class="glass-card flex-1 p-6 flex flex-col overflow-hidden animate-stagger" style="animation-delay: 0.6s;">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-gold font-cinzel font-bold text-xs tracking-[0.2em] uppercase">Directive_Log</h3>
-                            <span class="text-[8px] font-mono text-white/20">SYSTEM_UPLINK</span>
-                        </div>
-                        <div id="directive-terminal-log" class="flex-1 directive-terminal p-4 overflow-y-auto space-y-3 custom-scrollbar font-mono text-[10px]">
-                            <div class="flex gap-2 text-gold/60"><span class="shrink-0">[20:42]</span> <span>AUTHENTICATED: Sovereign Prime.</span></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
 
         <!-- [SH-1500] Tab: Growth -->
         <section id="growth-tab" class="tab-panel">
@@ -1797,7 +1736,6 @@
         <div>Sovereign_OS // 4Never_Hive</div>
         <div id="clock">00:00:00 UTC</div>
     </footer>
-
     <script>
         const AGENT_MAP = {
             'Alex': { role: 'Research Analyst', color: '#3B82F6', glow: 'glow-alex', emoji: '🔍' },
@@ -2032,22 +1970,72 @@
         async function loadCommandCenter() {
             console.log("Command: Synchronizing God-View HUD...");
             
-            // 1. Briefing Engine
+            // 1. Singularity Pulse & Diagnostics [SH-2000]
+            loadNeuralDiagnostics();
+
+            // 2. Briefing Engine
             const briefContainer = document.getElementById('briefing-container');
             if (window.executiveBriefing && briefContainer) {
                 briefContainer.innerHTML = await window.executiveBriefing.generateSummaryCard();
             }
 
-            // 2. Swarm Pulse (Mini)
+            // 3. Swarm Pulse (Mini)
             if (window.swarmPulse) {
                 window.swarmPulse.init('command-swarm-viz');
             }
 
-            // 3. Infrastructure (Mini)
+            // 4. Infrastructure (Mini)
             loadCommandNodeCluster();
 
-            // 4. Forge (Mini)
+            // 5. Forge (Mini)
             loadCommandForgeEvolution();
+        }
+
+        async function loadNeuralDiagnostics() {
+            const feed = document.getElementById('diagnostic-matrix-feed');
+            if (!feed) return;
+
+            // Try to fetch real diagnostics, fallback to mock for design display
+            const { data: diags } = await window.supabaseClient.from('system_diagnostics').select('*').order('timestamp', {ascending:false}).limit(10);
+            
+            if (diags && diags.length > 0) {
+                feed.innerHTML = diags.map(d => {
+                    const statusClass = d.repair_status === 'RESOLVED' ? 'status-hardened' : (d.severity_level >= 3 ? 'status-healing' : 'status-nominal');
+                    const statusLabel = d.repair_status === 'RESOLVED' ? 'HARDENED' : (d.severity_level >= 3 ? 'HEALING' : 'NOMINAL');
+                    return `
+                        <div class="diagnostic-matrix-item ${statusClass} p-2 rounded-r bg-white/[0.01]">
+                            <div class="flex justify-between font-bold"><span>[EVENT] ${d.error_type.toLowerCase()}</span><span>${statusLabel}</span></div>
+                            <p class="text-[8px] text-white/40 mt-1 italic">${d.source_component}: ${d.resolution_summary || 'Self-healing protocol engaged.'}</p>
+                        </div>
+                    `;
+                }).join('');
+
+                const isRepairing = diags.some(d => d.repair_status === 'PENDING' || d.repair_status === 'INVESTIGATING');
+                updateSingularityState(isRepairing ? 'REPAIRING' : 'NOMINAL');
+            } else {
+                // Default Nominal State
+                updateSingularityState('NOMINAL');
+            }
+        }
+
+        function updateSingularityState(status) {
+            const pulse = document.getElementById('singularity-pulse');
+            const statusLabel = document.getElementById('singularity-status');
+            if (!pulse || !statusLabel) return;
+
+            if (status === 'REPAIRING') {
+                pulse.classList.add('repairing', 'pulse-repairing');
+                pulse.classList.remove('pulse-healthy');
+                statusLabel.innerText = "System_Healing_Active";
+                statusLabel.classList.remove('text-cyan');
+                statusLabel.classList.add('text-healing', 'animate-pulse');
+            } else {
+                pulse.classList.remove('repairing', 'pulse-repairing');
+                pulse.classList.add('pulse-healthy');
+                statusLabel.innerText = "Systems_Nominal";
+                statusLabel.classList.add('text-cyan');
+                statusLabel.classList.remove('text-healing', 'animate-pulse');
+            }
         }
 
         function loadCommandSwarmPulse() {
@@ -3395,174 +3383,59 @@
             }
         }
 
-        window.onload = () => {
-            switchTab('dashboard', document.querySelector('#top-nav button'));
-            document.getElementById('nexus-form').addEventListener('submit', handleDispatch);
-            subscribeToRealtime();
-            setInterval(() => { document.getElementById('clock').innerText = new Date().toISOString().substring(11, 19) + ' UTC'; }, 1000);
-            
-            // [SH-1200] Forge Logic
-            initForgeTab();
-        };
-
-        async function initForgeTab() {
-            loadBlueprints();
-            loadScoutFeed();
-            
-            // Realtime for Product Blueprints
-            window.supabaseClient
-                .channel('public:product_blueprints')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'product_blueprints' }, () => {
-                    if(document.getElementById('forge-tab').classList.contains('active')) {
-                        loadBlueprints();
-                    }
-                })
-                .subscribe();
-        }
-
-        async function loadBlueprints() {
-            const { data: products } = await supabaseClient.from('product_blueprints').select('*').order('created_at', {ascending:false});
-            const grid = document.getElementById('forge-blueprint-grid');
-            if(!grid) return;
-            
-            grid.innerHTML = (products||[]).map((p, i) => {
-                const phase = p.forge_meta?.current_phase || 'ALEX';
-                const marketHeat = p.market_data?.heat || 0;
-                return `
-                    <div class="blueprint-card p-6 flex flex-col gap-4 animate-stagger" style="animation-delay: ${i*0.1}s">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="text-white font-bold text-sm font-cinzel tracking-widest uppercase">${p.name}</h4>
-                                <p class="text-[9px] text-gold/40 uppercase font-mono mt-1">${p.niche}</p>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <span class="px-2 py-0.5 rounded border border-white/10 text-[8px] font-mono text-cyan/60 uppercase">${p.status}</span>
-                                <div class="flex items-center gap-2">
-                                    <div class="market-heat-pulse"></div>
-                                    <span class="text-[8px] font-mono text-cyan uppercase tracking-tighter">Heat: ${marketHeat}%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="text-white/60 text-[11px] leading-relaxed font-sans line-clamp-2 italic h-8">${p.description || 'System generating elevator pitch...'}</p>
-                        <div class="pt-4 border-t border-white/5 flex justify-between items-center">
-                            <div class="flex gap-2">
-                                <button class="p-1.5 rounded hover:bg-white/5 transition-colors text-white/20 hover:text-gold" title="View PRD">📄</button>
-                                <button class="p-1.5 rounded hover:bg-white/5 transition-colors text-white/20 hover:text-purple-400" title="View Design">🎨</button>
-                                <button class="p-1.5 rounded hover:bg-white/5 transition-colors text-white/20 hover:text-emerald-400" title="View Code">💻</button>
-                            </div>
-                            <button onclick="startSprint('${p.id}')" class="text-[8px] font-bold text-gold/40 hover:text-gold uppercase tracking-[0.2em] transition-colors">Launch_Sprint</button>
-                        </div>
-                    </div>
+        // [SH-2000] Singularity Pulse UI Interaction Logic
+        window.addEventListener('neural-event', (e) => {
+            const diagnostic = e.detail;
+            const matrixFeed = document.getElementById('diagnostic-matrix-feed');
+            if (matrixFeed) {
+                const statusClass = diagnostic.severity_level >= 3 ? 'status-healing' : 'status-nominal';
+                const statusText = diagnostic.severity_level >= 3 ? 'CRITICAL_FAILURE' : 'WARNING';
+                const entry = document.createElement('div');
+                entry.className = `diagnostic-matrix-item ${statusClass} p-2 rounded-r bg-white/[0.01] animate-pulse`;
+                entry.innerHTML = `
+                    <div class="flex justify-between font-bold"><span>[${diagnostic.error_type}] ${diagnostic.source_component}</span><span>${statusText}</span></div>
+                    <p class="text-[8px] text-white/40 mt-1 italic">${diagnostic.error_payload.message}</p>
                 `;
-            }).join('');
-        }
-
-        async function loadScoutFeed() {
-            const { data: scoutLogs } = await window.supabaseClient.from('agent_logs').select('*').eq('agent_name', 'Alex').order('created_at', {ascending:false}).limit(20);
-            const feed = document.getElementById('forge-scout-feed');
-            if(!feed) return;
-            
-            feed.innerHTML = (scoutLogs||[]).map(l => `
-                <div class="flex gap-3 group">
-                    <span class="text-white/20 shrink-0 uppercase">[${new Date(l.created_at).toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit'})}]</span>
-                    <span class="text-blue-400/80 group-hover:text-blue-400 transition-colors">ALEX_SCOUT:</span>
-                    <span class="text-white/40 group-hover:text-white/80 font-sans italic truncate">${l.task_description}</span>
-                </div>
-            `).join('');
-        }
-
-        window.renderForgeTimer = function(remainingMs, elapsedMs) {
-            const timerEl = document.getElementById('forge-timer-countdown');
-            const outerRing = document.getElementById('forge-timer-outer');
-            if(!timerEl || !outerRing) return;
-            
-            const mins = Math.floor(remainingMs / 60000);
-            const secs = Math.floor((remainingMs % 60000) / 1000);
-            timerEl.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-            
-            // Total circumference: 2 * Math.PI * 120 = 753.98
-            const total = 3600000;
-            const progress = (elapsedMs / total) * 754;
-            outerRing.style.strokeDashoffset = 754 - progress;
-            
-            // Phase Highlights logic...
-            document.querySelectorAll('.forge-phase-indicator').forEach(el => el.classList.remove('active'));
-            if(elapsedMs < 600000) document.getElementById('phase-scout').classList.add('active');
-            else if(elapsedMs < 1500000) document.getElementById('phase-prd').classList.add('active');
-            else if(elapsedMs < 2400000) document.getElementById('phase-design').classList.add('active');
-            else document.getElementById('phase-code').classList.add('active');
-            
-            const currentPhase = (elapsedMs < 600000) ? 'SCOUT_PROTOCOL' : (elapsedMs < 1500000) ? 'PRD_SYNTHESIS' : (elapsedMs < 2400000) ? 'DESIGN_SYSTEM_FORGING' : 'CODEBASE_MATERIALIZATION';
-            document.getElementById('forge-current-phase-label').innerText = currentPhase;
-            
-            // [SH-1200] Dynamic DNA Helix Update
-            updateDNAStrand(elapsedMs);
-        }
-
-        let dnaPoints = [];
-        function updateDNAStrand(elapsedMs) {
-            const svg = d3.select('#forge-dna-viz');
-            const width = document.getElementById('forge-dna-container').clientWidth;
-            const height = document.getElementById('forge-dna-container').clientHeight;
-            
-            if(dnaPoints.length === 0) {
-                // Generate sine wave base pairs
-                for(let i=0; i<height; i+=10) {
-                    dnaPoints.push({ y: i, x: Math.sin(i/20)*20 + width/2 });
-                }
+                matrixFeed.insertBefore(entry, matrixFeed.firstChild);
             }
+        });
 
-            const line = d3.line().x(d => d.x).y(d => d.y).curve(d3.curveBasis);
-            svg.selectAll('.dna-strand-helix').remove();
-            
-            svg.append('path')
-                .datum(dnaPoints)
-                .attr('class', 'dna-strand-helix')
-                .attr('d', line)
-                .attr('stroke', 'rgba(0, 255, 255, 0.2)');
-
-            // Add second strand
-            svg.append('path')
-                .datum(dnaPoints.map(d => ({ y: d.y, x: width - d.x })))
-                .attr('class', 'dna-strand-helix')
-                .attr('d', line)
-                .attr('stroke', 'rgba(212, 175, 55, 0.2)');
-
-            // Node progress
-            const progress = (elapsedMs / 3600000) * height;
-            svg.selectAll('.dna-node').remove();
-            svg.append('circle')
-                .attr('class', 'dna-node')
-                .attr('cx', Math.sin(progress/20)*20 + width/2)
-                .attr('cy', progress)
-                .attr('r', 4)
-                .attr('fill', '#00FFFF')
-                .attr('filter', 'drop-shadow(0 0 5px #00FFFF)');
-        }
-
-        function loadSettings() {
-            // Settings logic
-        }
-
-        async function startNewSprint() {
-            // [SH-1200] Mock trigger: Creates a new blueprint entry and starts sprint
-            const { data: newBlueprint, error } = await window.supabaseClient.from('product_blueprints').insert([{
-                name: "Sovereign_CRM_v1",
-                niche: "Enterprise_SaaS",
-                description: "Autonomous CRM for sovereign entities with zero-knowledge encryption.",
-                market_data: { heat: 94 },
-                status: "IDEA",
-                forge_meta: { current_phase: "ALEX" }
-            }]).select().single();
-            
-            if(newBlueprint) startSprint(newBlueprint.id);
-        }
-
-        async function startSprint(id) {
-            if(window.forgeController) window.forgeController.startSprint(id);
-        }
-
-        /* [SH-1300] Command Center / God-View HUD Logic */
-        let isListening = false;
-        let recognition = null;
-
+        window.addEventListener('immune-response-active', (e) => {
+            const pulse = document.getElementById('singularity-pulse');
+            const dot = document.getElementById('pulse-dot');
+            const statusText = document.getElementById('pulse-status-text');
+            const glow = document.getElementById('pulse-glow');
+            if (pulse) {
+                pulse.classList.remove('pulse-healthy');
+                pulse.classList.add('pulse-repairing', 'repairing');
+                if (dot) {
+                    dot.classList.remove('bg-emerald-400');
+                    dot.classList.add('bg-rose-500', 'animate-ping');
+                }
+                if (statusText) {
+                    statusText.innerText = "NEURAL_REPAIR_ACTIVE";
+                    statusText.className = "text-[8px] font-mono text-rose-500 uppercase tracking-widest";
+                }
+                if (glow) {
+                    glow.classList.remove('bg-emerald-500');
+                    glow.classList.add('bg-rose-600', 'opacity-50');
+                }
+                setTimeout(() => {
+                    pulse.classList.remove('pulse-repairing', 'repairing');
+                    pulse.classList.add('pulse-healthy');
+                    if (dot) {
+                        dot.classList.remove('bg-rose-500', 'animate-ping');
+                        dot.classList.add('bg-emerald-400');
+                    }
+                    if (statusText) {
+                        statusText.innerText = "NEURAL_NOMINAL";
+                        statusText.className = "text-[8px] font-mono text-emerald-400 uppercase tracking-widest";
+                    }
+                    if (glow) {
+                        glow.classList.remove('bg-rose-600', 'opacity-50');
+                        glow.classList.add('bg-emerald-500');
+                    }
+                }, 8000);
+            }
+        });
+    </script></body></html>

@@ -14,9 +14,9 @@ export interface AgentConfig {
 }
 
 export const AGENTS: AgentConfig[] = [
-  { id: 'ALEX', name: 'Alex', position: [-2, 0, -2], color: '#3B82F6' },
-  { id: 'DEV', name: 'Dev', position: [2, 0, -2], color: '#10B981' },
-  { id: 'JORDAN', name: 'Jordan', position: [-3, 0, 1], color: '#F59E0B' },
-  { id: 'MAYA', name: 'Maya', position: [3, 0, 1], color: '#EC4899' },
-  { id: 'SENTINEL', name: 'Sentinel', position: [0, 0, 3], color: '#EF4444' }
+  { id: 'ALEX', name: 'A.L.E.X.', position: [-2, 0, -2], color: '#3B82F6' },
+  { id: 'DEV', name: 'D.E.V.', position: [2, 0, -2], color: '#10B981' },
+  { id: 'JORDAN', name: 'J.O.R.D.A.N.', position: [-3, 0, 1], color: '#F59E0B' },
+  { id: 'MAYA', name: 'M.A.Y.A.', position: [3, 0, 1], color: '#EC4899' },
+  { id: 'SENTINEL', name: 'S.A.M.', position: [0, 0, 3], color: '#EF4444' }
 ];

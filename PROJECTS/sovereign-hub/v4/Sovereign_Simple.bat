@@ -2,7 +2,7 @@
 :: SOVEREIGN_HUB v4.0 SIMPLE LAUNCHER
 :: No complex characters to avoid encoding issues.
 
-set "URL=http://bot-pod-1772662257-38fa3cf8.tailcb3609.ts.net/index.html"
+set "URL=http://100.93.140.118:8080/"
 
 echo Initializing Sovereign Hub v4.0...
 

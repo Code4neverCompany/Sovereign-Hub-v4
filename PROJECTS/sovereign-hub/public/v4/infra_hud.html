@@ -1,0 +1,50 @@
+<div class="max-w-[1600px] mx-auto space-y-10 py-10 px-12 animate-in fade-in duration-700">
+    <div class="flex justify-between items-end border-b border-white/5 pb-6">
+        <div>
+            <h2 class="doctrine-header text-3xl mb-2">INFRASTRUCTURE_GENESIS</h2>
+            <p class="data-label text-[10px] tracking-[0.4em]">Autonomous Physical Scaling // Multi-Cloud Provisioning</p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="switchInfraView('global')" class="px-6 py-2 text-[10px] font-black text-gold border border-gold/40 bg-gold/5 uppercase tracking-widest">Global_Status</button>
+            <button onclick="provisionNewNode()" class="px-6 py-2 text-[10px] font-black text-emerald-400 border border-emerald-500/40 bg-emerald-500/5 uppercase tracking-widest hover:bg-emerald-500/20 transition-all">Execute_Genesis_Pulse</button>
+        </div>
+    </div>
+
+    <!-- Capacity Meters -->
+    <div class="grid grid-cols-3 gap-8">
+        <div class="glass-card p-8 flex flex-col gap-6 border-gold/20">
+            <h3 class="data-label">Total_Swarm_Compute</h3>
+            <div class="metric-value text-5xl">128_CORES</div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-[9px] font-mono"><span class="text-white/40">Utilization</span><span class="text-gold">72%</span></div>
+                <div class="h-1 w-full bg-white/5"><div class="h-full bg-gold shadow-[0_0_10px_#FFD700]" style="width: 72%"></div></div>
+            </div>
+        </div>
+        <div class="glass-card p-8 flex flex-col gap-6 border-violet/20">
+            <h3 class="data-label">Neural_VRAM_Pool</h3>
+            <div class="metric-value text-5xl text-violet">1.2_TB</div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-[9px] font-mono"><span class="text-white/40">Utilization</span><span class="text-violet">45%</span></div>
+                <div class="h-1 w-full bg-white/5"><div class="h-full bg-violet shadow-[0_0_10px_#8B5CF6]" style="width: 45%"></div></div>
+            </div>
+        </div>
+        <div class="glass-card p-8 flex flex-col gap-6 border-magenta/20">
+            <h3 class="data-label">Burn_Rate // Operational</h3>
+            <div class="metric-value text-5xl text-magenta">$4.22/hr</div>
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-magenta animate-pulse"></div>
+                <span class="text-[9px] font-mono text-magenta/60 uppercase tracking-widest">Budget_Nominal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Provisioning Timeline -->
+    <div class="glass-card p-10 min-h-[400px]">
+        <h3 class="data-label mb-10 border-b border-white/5 pb-4">GENESIS_BOOTSTRAP_SEQUENCES</h3>
+        <div id="provisioning-feed" class="space-y-8">
+            <div class="flex items-center justify-center h-48 border border-white/5 border-dashed text-white/10 uppercase tracking-[0.5em] text-xs">
+                Waiting_For_Genesis_Pulse...
+            </div>
+        </div>
+    </div>
+</div>

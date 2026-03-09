@@ -1,0 +1,32 @@
+[
+  {
+    "id": "p1",
+    "name": "SOVEREIGN_HUB",
+    "meta": {
+      "progress": 94,
+      "status": "STABLE",
+      "roi": "+312%"
+    },
+    "created_at": "2026-03-07T16:15:04.423Z"
+  },
+  {
+    "id": "p2",
+    "name": "LOOPSHIELD_AI",
+    "meta": {
+      "progress": 45,
+      "status": "DECOUPLED",
+      "roi": "+124%"
+    },
+    "created_at": "2026-03-07T16:15:04.424Z"
+  },
+  {
+    "id": "p3",
+    "name": "NEXUS_CORE",
+    "meta": {
+      "progress": 15,
+      "status": "PLANNING",
+      "roi": "TBD"
+    },
+    "created_at": "2026-03-07T16:15:04.424Z"
+  }
+]

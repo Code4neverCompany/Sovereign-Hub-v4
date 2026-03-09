@@ -1,0 +1,18 @@
+{
+    "project": "LoopShield AI",
+    "design_id": "FORGE_20260305_01",
+    "aesthetic": "Lux 3.0",
+    "colors": {
+        "background": "#0A0A0A",
+        "primary": "#D4AF37",
+        "accent": "#00FFFF",
+        "danger": "#FF0000"
+    },
+    "components": [
+        "Kill-Switch Radial Interface",
+        "Token Drift Polyline Chart",
+        "Recursive Guardrail Cards"
+    ],
+    "mockup_url": "v4/LoopShield_Landing.html",
+    "status": "design_complete"
+}

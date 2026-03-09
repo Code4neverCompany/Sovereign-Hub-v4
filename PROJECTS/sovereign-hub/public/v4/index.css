@@ -1,0 +1,117 @@
+/* 🔱 Sovereign_OS v7.2 - THE SINGULARITY ELITE HUD */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Michroma&family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root {
+    --void: #020105;
+    --deep-obsidian: #05020A;
+    --amethyst-glass: rgba(25, 10, 50, 0.85);
+    --light-violet: #A78BFA;
+    --electric-violet: #8B5CF6;
+    --imperial-gold: #FFD700;
+    --pure-white: #FFFFFF;
+    --neon-magenta: #F472B6;
+    
+    /* High Luminance Glows */
+    --gold-glow: 0 0 20px rgba(255, 215, 0, 0.4);
+    --violet-glow: 0 0 20px rgba(167, 139, 250, 0.4);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-void text-white font-rajdhani overflow-hidden antialiased;
+        height: 100vh; width: 100vw;
+        background: 
+            radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.2) 0%, transparent 60%),
+            radial-gradient(circle at 0% 100%, rgba(255, 215, 0, 0.05) 0%, transparent 40%),
+            var(--void);
+    }
+
+    /* Precision Grid Overlay */
+    body::after {
+        content: ""; position: fixed; inset: 0;
+        background-image: 
+            linear-gradient(rgba(167, 139, 250, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(167, 139, 250, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none; z-index: 1000;
+    }
+}
+
+/* 💎 ELITE HUD COMPONENTS */
+.glass-card {
+    background: var(--amethyst-glass);
+    backdrop-filter: blur(35px) saturate(180%);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(167, 139, 250, 0.1);
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.hex-clip {
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+}
+
+.glass-card:hover {
+    border-color: var(--imperial-gold);
+    box-shadow: 0 0 60px rgba(167, 139, 250, 0.2), inset 0 0 15px rgba(255, 215, 0, 0.1);
+    transform: translateY(-3px) scale(1.002);
+}
+
+/* ⚡ HIGH-CONTRAST TEXT */
+.text-gold { color: var(--imperial-gold) !important; text-shadow: var(--gold-glow); }
+.text-violet { color: var(--light-violet) !important; text-shadow: var(--violet-glow); }
+.text-dim { color: rgba(255, 255, 255, 0.5); }
+
+h1, h2, h3, .orbitron {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    background: linear-gradient(to bottom, #FFF 20%, var(--imperial-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.data-label {
+    @apply text-[9px] font-mono uppercase tracking-[0.4em] text-white/90;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.metric-value {
+    font-family: 'Michroma', sans-serif;
+    @apply text-white;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
+}
+
+/* 🧬 HIERARCHY MODULES */
+.agent-node {
+    @apply bg-black/60 border border-white/10 p-4 relative transition-all duration-500;
+    clip-path: polygon(10% 0%, 100% 0%, 100% 90%, 90% 100%, 0% 100%, 0% 10%);
+}
+
+.agent-node:hover {
+    @apply border-gold bg-deep-purple/40;
+    transform: translateZ(20px);
+}
+
+/* 🛰️ SCANLINE & INTERFERENCE */
+.scanline {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent, rgba(255, 215, 0, 0.05), transparent);
+    height: 10%; width: 100%;
+    animation: scan-move 6s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes scan-move {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(1000%); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, var(--light-violet), var(--imperial-gold)); }

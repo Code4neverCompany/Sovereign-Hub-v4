@@ -1,0 +1,16 @@
+{
+  "name": "Sovereign_Hub v4.0",
+  "short_name": "Sovereign",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0A0A0A",
+  "theme_color": "#D4AF37",
+  "description": "High-Fidelity Command & Control Center for the 4Never Hive",
+  "icons": [
+    {
+      "src": "https://static-us-img.skywork.ai/test/note/2025-12-12/6241771231207272527/1999339778030030848_note.image/png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

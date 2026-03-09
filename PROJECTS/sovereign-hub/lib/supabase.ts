@@ -1,71 +1,84 @@
-import { createClient } from '@supabase/supabase-js'
-import crypto from 'crypto';
+// 🔱 SOVEREIGN HUB: GHOST-BACKEND ADAPTER
+// This file replaces the real Supabase client with a local file-based implementation.
+// All agents and UI components will now use this for persistence.
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+import fs from 'fs';
+import path from 'path';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Note: In Next.js App Router, these functions run on the server.
+const DATA_DIR = path.resolve(process.cwd(), 'data');
+const LOGS_PATH = path.join(DATA_DIR, 'activities.jsonl');
+const STATES_DIR = path.join(DATA_DIR, 'states');
 
-export interface AgentLog {
-  agent_id: string;
-  message: string;
-  level: string;
-  timestamp: string;
-  hash?: string;
+// Helper to ensure data directory exists
+const ensureStorage = () => {
+  if (!fs.existsSync(STATES_DIR)) fs.mkdirSync(STATES_DIR, { recursive: true });
+};
+
+export const supabase = {
+  from: (table: string) => ({
+    insert: async (records: any[]) => {
+      ensureStorage();
+      if (table === 'agent_logs') {
+        const lines = records.map(r => JSON.stringify({ ...r, timestamp: r.timestamp || new Date().toISOString() })).join('\n') + '\n';
+        fs.appendFileSync(LOGS_PATH, lines);
+      }
+      return { data: null, error: null };
+    },
+    upsert: async (records: any[], options: any) => {
+      ensureStorage();
+      if (table === 'agent_states') {
+        records.forEach(r => {
+          const filePath = path.join(STATES_DIR, `${r.agent_id.toLowerCase()}.json`);
+          fs.writeFileSync(filePath, JSON.stringify({ ...r, updated_at: new Date().toISOString() }, null, 2));
+        });
+      }
+      if (table === 'projects') {
+        records.forEach(r => {
+          const filePath = path.join(DATA_DIR, `project-${r.name.toLowerCase()}.json`);
+          fs.writeFileSync(filePath, JSON.stringify({ ...r, updated_at: new Date().toISOString() }, null, 2));
+        });
+      }
+      return { data: null, error: null };
+    },
+    select: (query: string) => ({
+      limit: (n: number) => ({
+        order: (col: string, opts: any) => ({
+          // Mock select for UI hydration
+          then: (cb: any) => cb({ data: [], error: null })
+        }),
+        then: (cb: any) => cb({ data: [], error: null })
+      }),
+      then: (cb: any) => cb({ data: [], error: null })
+    }),
+    update: (updates: any) => ({
+      eq: (col: string, val: any) => ({
+        then: (cb: any) => {
+          ensureStorage();
+          if (table === 'agent_states' && col === 'agent_id') {
+             const filePath = path.join(STATES_DIR, `${val.toLowerCase()}.json`);
+             let existing = {};
+             if (fs.existsSync(filePath)) existing = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+             fs.writeFileSync(filePath, JSON.stringify({ ...existing, ...updates, updated_at: new Date().toISOString() }, null, 2));
+          }
+          return cb({ error: null });
+        }
+      })
+    })
+  }),
+  channel: (name: string) => ({
+    on: (event: string, filter: any, cb: any) => ({
+      subscribe: () => ({ unsubscribe: () => {} })
+    }),
+    subscribe: () => {}
+  })
+};
+
+// Original interface maintained for compatibility
+export async function logToSupabase(log: any) {
+    return supabase.from('agent_logs').insert([log]);
 }
 
-export interface AgentState {
-  agent_id: string;
-  name: string;
-  emoji: string;
-  model_engine: string;
-  status: AgentStatus;
-  active_task?: string;
-  last_updated: string;
-}
-
-export type AgentStatus = 'IDLE' | 'BUSY' | 'ERROR' | 'OFFLINE';
-
-export function calculateHash(log: Omit<AgentLog, 'hash'>): string {
-  return crypto
-    .createHash('sha256')
-    .update(JSON.stringify(log))
-    .digest('hex');
-}
-
-export async function logToSupabase({ agent_id, message, level, timestamp, hash }: AgentLog) {
-    try {
-        const { error } = await supabase
-            .from('agent_logs')
-            .insert([{ agent_id, message, level, timestamp, hash }])
-        if (error) throw error
-    } catch (e) {
-        console.error('Failed to log to Supabase', e)
-    }
-}
-
-export function subscribeToLogs(callback: (payload: any) => void) {
-  return supabase
-    .channel('agent_logs_realtime')
-    .on('postgres_changes', { event: 'INSERT', table: 'agent_logs' }, callback)
-    .subscribe();
-}
-
-export function subscribeToAgentStates(callback: (payload: any) => void) {
-  return supabase
-    .channel('agent_states_realtime')
-    .on('postgres_changes', { event: 'UPDATE', table: 'agent_states' }, callback)
-    .subscribe();
-}
-
-export async function updateAgentState(agent_id: string, updates: Partial<AgentState>) {
-  try {
-    const { error } = await supabase
-      .from('agent_states')
-      .update(updates)
-      .eq('agent_id', agent_id);
-    if (error) throw error;
-  } catch (e) {
-    console.error(`Failed to update agent state for ${agent_id}`, e);
-  }
+export async function updateAgentState(agent_id: string, updates: any) {
+    return supabase.from('agent_states').update(updates).eq('agent_id', agent_id);
 }

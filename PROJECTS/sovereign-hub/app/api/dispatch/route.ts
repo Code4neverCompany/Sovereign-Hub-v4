@@ -1,25 +1,29 @@
-export const dynamic = 'force-static';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { logToSupabase } from '../../../lib/supabase';
+import { SovereignNativeAdapter } from '../../../lib/sovereign-native/adapter';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    const { agentId, agentName } = await req.json();
+    const { agentId, agentName, description, priority } = await req.json();
 
-    // Log to Supabase first as requested
-    await logToSupabase({
-      agent_id: agentId,
-      message: `Dispatching agent: ${agentName}`,
-      level: 'INFO',
-      timestamp: new Date().toISOString(),
+    // 🔱 Sovereign-Native Dispatch: OpenClaw backend integration
+    await SovereignNativeAdapter.log(
+      'SYS', 
+      `Dispatching agent: ${agentName} for task: ${description}`, 
+      'INFO', 
+      { agentId, priority }
+    );
+
+    const task = await SovereignNativeAdapter.addTask({
+      agentId,
+      description,
+      priority: priority || 'MEDIUM'
     });
 
-    // Integrated with OpenClaw session_spawn tool (simulated for now as actual tool access is via system calling)
-    // In a real environment, this might call an OpenClaw Gateway API or use an internal library
-    console.log(`[OpenClaw] Spawning session for agent: ${agentId}`);
+    console.log(`[OpenClaw Native] Mission dispatched: ${task.id} for agent: ${agentId}`);
 
-    return NextResponse.json({ success: true, message: `Agent ${agentName} dispatched.` });
+    return NextResponse.json({ success: true, task });
   } catch (error: any) {
     console.error('Dispatch API error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

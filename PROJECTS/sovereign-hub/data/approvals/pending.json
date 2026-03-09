@@ -1,0 +1,24 @@
+[
+  {
+    "id": "app1",
+    "agent_id": "alex",
+    "action": "WRITE_FILE",
+    "payload": {
+      "path": "AGENTS.md",
+      "content": "..."
+    },
+    "status": "APPROVED",
+    "timestamp": "2026-03-07T16:15:04.438Z"
+  },
+  {
+    "id": "app2",
+    "agent_id": "sam",
+    "action": "EXTERNAL_MSG",
+    "payload": {
+      "to": "Telegram",
+      "body": "Alert!"
+    },
+    "status": "APPROVED",
+    "timestamp": "2026-03-07T16:15:04.438Z"
+  }
+]

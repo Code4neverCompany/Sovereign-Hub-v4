@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useTelemetry } from '../hooks/useTelemetry'
 
-// LogicTree Nodes Configuration
 const NODES = {
   GATEWAY: { id: 'GATEWAY', x: 50, y: 50, label: 'CORE GATEWAY' },
   SENTINEL: { id: 'SENTINEL', x: 250, y: 50, label: 'SENTINEL PRIME' },
@@ -24,17 +23,14 @@ interface PathUpdate {
 export default function LogicTree() {
   const telemetry = useTelemetry()
   const [activePaths, setActivePaths] = useState<PathUpdate[]>([])
-
-  // Use the cubic-bezier directly for Framer, keeping it synced with CSS --vault-easing
-  const vaultEasing = [0.4, 0, 0.2, 1] as const // Maps to cubic-bezier(0.4, 0, 0.2, 1)
+  const vaultEasing = [0.4, 0, 0.2, 1] as const
 
   useEffect(() => {
-    // Audit log for remediation
     const logRemediation = async () => {
       const { logToSupabase } = await import('../lib/supabase')
       await logToSupabase({
-        agent_id: 'SH-005.3',
-        message: 'Aesthetic Restoration complete for LogicTree.tsx.',
+        agent_id: 'SYSTEM',
+        message: 'Aureum Logic Visualizer: Restored to Sovereign Standard.',
         level: 'INFO',
         timestamp: new Date().toISOString(),
       })
@@ -55,7 +51,6 @@ export default function LogicTree() {
         
         setActivePaths((prev) => [newPath, ...prev].slice(0, 5))
         
-        // Remove path after animation
         setTimeout(() => {
           setActivePaths((prev) => prev.filter(p => p.id !== newPath.id))
         }, 2500)
@@ -64,29 +59,25 @@ export default function LogicTree() {
   }, [telemetry])
 
   return (
-    <div className="relative w-full h-[300px] glass-panel overflow-hidden p-4">
-      <div className="absolute top-2 left-4 text-[10px] font-cinzel text-gold-leaf/50 tracking-widest uppercase">
-        Real-time Logic Infrastructure Visualizer
+    <div className="relative w-full h-full glass-panel overflow-hidden p-4 group">
+      <div className="absolute top-2 left-4 text-[9px] font-black font-mono text-[#FFD700]/40 tracking-[0.3em] uppercase transition-colors group-hover:text-[#FFD700]/80">
+        Logic_Infra_Visualizer // v4.0
       </div>
       
-      <svg viewBox="0 0 500 250" className="w-full h-full">
-        {/* Connection Lines (Glow/Static) */}
+      <svg viewBox="0 0 500 250" className="w-full h-full relative z-10">
         <defs>
           <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="layer1" />
-            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="layer2" />
-            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="layer3" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="layer2" />
             <feMerge>
-              <feMergeNode in="layer3" />
               <feMergeNode in="layer2" />
-              <feMergeNode in="layer1" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
         </defs>
 
         {/* Static Background Paths */}
-        <g stroke="rgba(212, 175, 55, 0.1)" strokeWidth="0.5" fill="none">
+        <g stroke="rgba(139, 92, 246, 0.05)" strokeWidth="0.5" fill="none">
           <path d="M 50 50 L 250 50" />
           <path d="M 250 50 L 450 50" />
           <path d="M 250 50 L 250 200" />
@@ -96,12 +87,12 @@ export default function LogicTree() {
           <path d="M 450 50 L 450 200" />
         </g>
 
-        {/* Animated Data Paths (Aureum Cinematic) */}
+        {/* Animated Data Paths */}
         <AnimatePresence>
           {activePaths.map((path) => {
             const start = NODES[path.source]
             const end = NODES[path.target]
-            const color = path.status === 'SUCCESS' ? '#D4AF37' : '#FF4444'
+            const color = path.status === 'SUCCESS' ? '#FFD700' : '#FF4444'
             
             return (
               <motion.path
@@ -114,10 +105,10 @@ export default function LogicTree() {
                 }}
                 d={`M ${start.x} ${start.y} L ${end.x} ${end.y}`}
                 stroke={color}
-                strokeWidth="2"
+                strokeWidth="1.5"
                 fill="none"
                 filter="url(#glow)"
-                style={{ strokeDasharray: "5,5" }}
+                style={{ strokeDasharray: "4,4" }}
               />
             )
           })}
@@ -125,22 +116,26 @@ export default function LogicTree() {
 
         {/* Nodes */}
         {Object.values(NODES).map((node) => (
-          <g key={node.id} transform={`translate(${node.x}, ${node.y})`}>
-            <circle r="4" fill="#000" stroke="#D4AF37" strokeWidth="1" />
-            <circle r="1" fill="#D4AF37" />
+          <g key={node.id} transform={`translate(${node.x}, ${node.y})`} className="group/node">
+            <circle r="3" fill="#050505" stroke="#8B5CF6" strokeWidth="1" className="group-hover/node:stroke-[#FFD700] transition-colors duration-300" />
+            <circle r="1" fill="#8B5CF6" className="group-hover/node:fill-[#FFD700] transition-colors duration-300" />
             <text
-              y="-10"
-              fontSize="6"
-              fontFamily="Cinzel, serif"
-              fill="#D4AF37"
+              y="-12"
+              fontSize="7"
+              fontFamily="monospace"
+              fontWeight="900"
+              fill="#FFD700"
               textAnchor="middle"
-              className="uppercase tracking-tighter opacity-70"
+              className="uppercase tracking-widest opacity-40 group-hover/node:opacity-100 transition-all duration-300"
             >
               {node.label}
             </text>
           </g>
         ))}
       </svg>
+
+      {/* Grid Overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-5 bg-[radial-gradient(#8B5CF6_1px,transparent_1px)] [background-size:20px_20px]" />
     </div>
   )
 }

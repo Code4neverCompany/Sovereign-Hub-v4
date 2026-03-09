@@ -1,0 +1,40 @@
+{
+  "description": "🔱 Sovereign Fleet Discord Configuration Template",
+  "instructions": "Replace 'TOKEN_HERE' with the tokens from Discord Developer Portal. Then send this back to N.O.V.A.",
+  "channels": {
+    "discord": {
+      "accounts": [
+        {
+          "agentId": "alex",
+          "name": "Alex [Architect]",
+          "token": "TOKEN_HERE",
+          "enabled": true
+        },
+        {
+          "agentId": "maya",
+          "name": "Maya [Design]",
+          "token": "TOKEN_HERE",
+          "enabled": true
+        },
+        {
+          "agentId": "jordan",
+          "name": "Jordan [Strategy]",
+          "token": "TOKEN_HERE",
+          "enabled": true
+        },
+        {
+          "agentId": "dev",
+          "name": "Dev [Builder]",
+          "token": "TOKEN_HERE",
+          "enabled": true
+        },
+        {
+          "agentId": "sam",
+          "name": "Sam [Sentinel]",
+          "token": "TOKEN_HERE",
+          "enabled": true
+        }
+      ]
+    }
+  }
+}

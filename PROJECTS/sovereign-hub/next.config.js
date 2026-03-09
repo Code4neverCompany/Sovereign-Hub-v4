@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  distDir: 'out', // Standard out directory
+  // 🏁 NEP v1.1 Standard: Dynamic Server Mode (Not static export)
   images: {
     unoptimized: true,
   },

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "loopshield-ai",
+    "name": "LoopShield AI",
+    "status": "OPERATIONAL",
+    "location": "/PROJECTS/loopshield-ai",
+    "lastPulseAt": "2026-03-07T21:00:00.000Z",
+    "health": 100,
+    "metrics": {
+      "protectionLevel": "MAXIMUM",
+      "activeThreats": 0
+    }
+  },
+  {
+    "id": "sovereign-hub",
+    "name": "Sovereign Hub Core",
+    "status": "OPERATIONAL",
+    "location": "/PROJECTS/sovereign-hub",
+    "lastPulseAt": "2026-03-07T21:01:00.000Z",
+    "health": 100,
+    "metrics": {
+      "neuralThroughput": "1.2 GP/s",
+      "sentinelStatus": "LOCKED"
+    }
+  },
+  {
+    "id": "ClawX",
+    "name": "ClawX Desktop HUD",
+    "status": "OPERATIONAL",
+    "location": "/PROJECTS/ClawX",
+    "lastPulseAt": "2026-03-08T07:00:00.000Z",
+    "health": 100,
+    "metrics": {
+      "activeWindows": 3,
+      "latencyMs": 15
+    }
+  }
+]

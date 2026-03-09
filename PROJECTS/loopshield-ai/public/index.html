@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoopShield AI | Sovereign Protection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --void-black: #0A0A0A;
+            --imperial-gold: #D4AF37;
+            --cyan-pulse: #00FFFF;
+            --purple-haze: #A855F7;
+            --glass-white: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--void-black);
+            color: white;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+            border-bottom: 1px solid var(--imperial-gold);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 5rem;
+            color: var(--imperial-gold);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: var(--cyan-pulse);
+            opacity: 0.8;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .cta-button {
+            margin-top: 3rem;
+            padding: 1rem 3rem;
+            background: transparent;
+            border: 1px solid var(--imperial-gold);
+            color: var(--imperial-gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button:hover {
+            background: var(--imperial-gold);
+            color: var(--void-black);
+            box-shadow: 0 0 30px var(--imperial-gold);
+        }
+
+        .dashboard-mockup {
+            padding: 5rem 2rem;
+            display: flex;
+            justify-content: center;
+            background: #111;
+        }
+
+        .mockup-container {
+            width: 90%;
+            max-width: 1200px;
+            background: var(--void-black);
+            border: 2px solid var(--glass-white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .shelf-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-white);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kill-switch {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #330000;
+            border: 4px solid #cc0000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: inset 0 0 20px #ff0000, 0 0 10px #ff0000;
+            transition: transform 0.1s;
+        }
+
+        .kill-switch:active {
+            transform: scale(0.95);
+            background: #ff0000;
+        }
+
+        .kill-switch span {
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-shadow: 0 0 5px black;
+        }
+
+        .token-chart {
+            height: 200px;
+            width: 100%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 255, 255, 0.05) 10px, rgba(0, 255, 255, 0.05) 20px);
+            border: 1px solid var(--cyan-pulse);
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .token-line {
+            fill: none;
+            stroke: var(--cyan-pulse);
+            stroke-width: 2;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--glass-white);
+            padding: 1.5rem;
+            border: 1px solid transparent;
+            transition: border 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--imperial-gold);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: #444;
+            font-size: 0.8rem;
+            border-top: 1px solid var(--glass-white);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LOOPSHIELD AI</h1>
+        <p class="tagline">Neural Red-Teaming & Recursive Loop Suppression</p>
+        <button class="cta-button">INITIATE SHIELD</button>
+    </header>
+
+    <section class="dashboard-mockup">
+        <div class="mockup-container">
+            <div class="shelf-header">
+                <div style="font-family: 'Cinzel'; font-size: 1.5rem; color: var(--imperial-gold);">CORE OVERWATCH</div>
+                <div style="color: #666;">STATUS: <span style="color: #00ff00;">ARMED</span></div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,0,0,0.05); border: 1px dashed #ff0000; padding: 2rem;">
+                    <div style="color: #ff0000; margin-bottom: 1rem; font-size: 0.7rem; letter-spacing: 2px;">EMERGENCY NEURAL PURGE</div>
+                    <div class="kill-switch">
+                        <span>KILL SWITCH</span>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--cyan-pulse); letter-spacing: 2px;">TOKEN DRIFT ANALYTICS</div>
+                    <div class="token-chart">
+                         <!-- Simulated Chart -->
+                         <svg width="100%" height="100%" viewBox="0 0 400 200">
+                             <path d="M0 150 L50 140 L100 160 L150 130 L200 170 L250 80 L300 110 L350 40 L400 90" class="token-line" />
+                             <circle cx="350" cy="40" r="4" fill="var(--cyan-pulse)" />
+                             <text x="360" y="35" fill="var(--cyan-pulse)" font-size="10">DRIFT DETECTED</text>
+                         </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3 style="color: var(--imperial-gold);">Recursive Guardrails</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Prevents infinite loop hallucination in LLM reasoning chains.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 style="color: var(--imperial-gold);">Budget Overwatch</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Real-time token cost attribution and hard-stop enforcement.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 style="color: var(--imperial-gold);">Drift Protection</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Detects when agent intent deviates from initial PRD constraints.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2026 SOVEREIGN HUB V4.0 // 4NEVER HIVE OPERATIONAL LAYER
+    </footer>
+
+</body>
+</html>
